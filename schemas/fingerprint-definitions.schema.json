@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/fingerprint-definitions-1.0.json",
+  "title": "Blueleaf Fingerprint Definition Set",
+  "description": "Versioned data-only fingerprint rules. Match values are literals, never executable patterns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "definitions"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "definitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/definition" }
+    }
+  },
+  "$defs": {
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "displayName",
+        "category",
+        "minimumConfidence",
+        "singleSignalConfidenceCap",
+        "signals"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "category": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "minimumConfidence": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "singleSignalConfidenceCap": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "contradicts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+        },
+        "signals": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/signal" }
+        }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "evidenceTypes", "operator", "value", "weight", "reason"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "evidenceTypes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string" }
+        },
+        "sources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" }
+        },
+        "keys": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "operator": { "enum": ["equals", "contains", "prefix"] },
+        "value": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "weight": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 256 }
+      }
+    }
+  }
+}

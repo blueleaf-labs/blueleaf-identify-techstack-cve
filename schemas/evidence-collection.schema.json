@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/evidence-collection-1.0.json",
+  "title": "Blueleaf Evidence Collection",
+  "description": "Technology-agnostic passive observations collected from one probe result.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "evidence", "processing"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "processing": { "$ref": "#/$defs/processing" }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "source", "normalizedValue", "strength", "reason"],
+      "properties": {
+        "type": {
+          "enum": [
+            "http-status",
+            "final-url",
+            "content-type",
+            "content-length",
+            "header",
+            "cookie",
+            "redirect",
+            "tls",
+            "network",
+            "timing",
+            "content-marker",
+            "html-meta",
+            "html-generator",
+            "html-title",
+            "script-url",
+            "stylesheet-url",
+            "asset-url"
+          ]
+        },
+        "source": {
+          "enum": [
+            "probe.status",
+            "probe.final-url",
+            "probe.content-type",
+            "probe.content-length",
+            "response.headers",
+            "response.cookies",
+            "probe.redirect-chain",
+            "probe.tls",
+            "probe.network",
+            "probe.timing",
+            "response.body.signature",
+            "html.meta",
+            "html.generator",
+            "html.title",
+            "html.script.src",
+            "html.link.stylesheet",
+            "html.asset.url"
+          ]
+        },
+        "normalizedValue": { "type": "string", "maxLength": 2048 },
+        "rawValue": { "type": "string", "maxLength": 512 },
+        "key": { "type": "string", "maxLength": 128 },
+        "versionHint": { "type": "string", "maxLength": 128 },
+        "technologyHint": { "type": "string", "maxLength": 128 },
+        "strength": { "enum": ["direct", "derived"] },
+        "reason": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "processing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bodyBytesReceived",
+        "bodyBytesExamined",
+        "bodyTruncated",
+        "evidenceTruncated"
+      ],
+      "properties": {
+        "bodyBytesReceived": { "type": "integer", "minimum": 0 },
+        "bodyBytesExamined": { "type": "integer", "minimum": 0 },
+        "bodyTruncated": { "type": "boolean" },
+        "evidenceTruncated": { "type": "boolean" }
+      }
+    }
+  }
+}

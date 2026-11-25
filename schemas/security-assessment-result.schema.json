@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/security-assessment-result-1.0.json",
+  "title": "Blueleaf confidence and security assessment",
+  "description": "Deterministic target, technology, and per-advisory assessments. NO_KNOWN_VULNERABILITY is scoped to supplied sources and does not mean secure.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "assessedAt",
+    "state",
+    "confidence",
+    "explanations",
+    "technologyAssessments",
+    "intelligenceCoverage",
+    "limitations"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "assessedAt": { "type": "string", "format": "date-time" },
+    "state": { "$ref": "#/$defs/state" },
+    "confidence": { "$ref": "#/$defs/confidence" },
+    "explanations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "technologyAssessments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/technology" }
+    },
+    "intelligenceCoverage": { "$ref": "#/$defs/coverage" },
+    "limitations": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "CONFIRMED_VULNERABLE",
+        "LIKELY_VULNERABLE",
+        "PATCHED",
+        "PATCHED_BY_VENDOR",
+        "NO_KNOWN_VULNERABILITY",
+        "VERSION_UNKNOWN",
+        "TECHNOLOGY_UNKNOWN",
+        "INSUFFICIENT_EVIDENCE",
+        "INTELLIGENCE_UNAVAILABLE",
+        "CONFLICTING_EVIDENCE"
+      ]
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "rationale"],
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "rationale": { "type": "string" }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technologyIdentification",
+        "versionIdentification",
+        "packageIdentity",
+        "vulnerabilityApplicability",
+        "advisoryEvidence",
+        "intelligenceCompleteness",
+        "independentCorroboration",
+        "contradictionPenalty",
+        "overall",
+        "formula"
+      ],
+      "properties": {
+        "technologyIdentification": { "$ref": "#/$defs/dimension" },
+        "versionIdentification": { "$ref": "#/$defs/dimension" },
+        "packageIdentity": { "$ref": "#/$defs/dimension" },
+        "vulnerabilityApplicability": { "$ref": "#/$defs/dimension" },
+        "advisoryEvidence": { "$ref": "#/$defs/dimension" },
+        "intelligenceCompleteness": { "$ref": "#/$defs/dimension" },
+        "independentCorroboration": { "$ref": "#/$defs/dimension" },
+        "contradictionPenalty": { "$ref": "#/$defs/dimension" },
+        "overall": { "type": "number", "minimum": 0, "maximum": 1 },
+        "formula": { "type": "string" }
+      }
+    },
+    "sourceCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerId", "status", "stale", "diagnostics"],
+      "properties": {
+        "providerId": { "type": "string" },
+        "status": {
+          "enum": [
+            "RESULTS",
+            "NO_RESULTS",
+            "PARTIAL_RESULTS",
+            "PROVIDER_UNAVAILABLE",
+            "UNSUPPORTED"
+          ]
+        },
+        "retrievedAt": { "type": "string", "format": "date-time" },
+        "sourceModifiedAt": { "type": "string", "format": "date-time" },
+        "ageMs": { "type": "number", "minimum": 0 },
+        "stale": { "type": "boolean" },
+        "diagnostics": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "sources", "unsupportedMappings", "limitations"],
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "unavailable",
+            "stale",
+            "unsupported",
+            "unknown"
+          ]
+        },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/sourceCoverage" } },
+        "unsupportedMappings": { "type": "array", "items": { "type": "string" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "advisory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aliases",
+        "state",
+        "confidence",
+        "correlation",
+        "sourceRecords",
+        "explanations"
+      ],
+      "properties": {
+        "advisoryId": { "type": "string" },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "state": { "$ref": "#/$defs/state" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "correlation": {
+          "$ref": "https://blueleaf.dev/schemas/correlation-result-1.0.json#/$defs/result"
+        },
+        "sourceRecords": {
+          "type": "array",
+          "items": { "$ref": "normalized-advisory.schema.json" }
+        },
+        "explanations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "technology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technologyId",
+        "displayName",
+        "state",
+        "confidence",
+        "explanations",
+        "detection",
+        "advisoryAssessments",
+        "intelligenceCoverage",
+        "limitations"
+      ],
+      "properties": {
+        "technologyId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "state": { "$ref": "#/$defs/state" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "explanations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "detection": {
+          "$ref": "https://blueleaf.dev/schemas/fingerprint-result-1.0.json#/$defs/detection"
+        },
+        "versionAssessment": {
+          "$ref": "https://blueleaf.dev/schemas/version-assessment-1.0.json#/$defs/assessment"
+        },
+        "packageMapping": {
+          "$ref": "https://blueleaf.dev/schemas/technology-package-mapping-1.0.json"
+        },
+        "advisoryAssessments": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/advisory" }
+        },
+        "intelligenceCoverage": { "$ref": "#/$defs/coverage" },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

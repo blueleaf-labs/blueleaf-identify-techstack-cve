@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/correlation-result-1.0.json",
+  "title": "Blueleaf advisory correlation collection",
+  "description": "Per-advisory applicability evidence. This schema does not express an overall target security status.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "fingerprintSchemaVersion",
+    "versionAssessmentSchemaVersion",
+    "intelligenceSchemaVersion",
+    "intelligenceStatuses",
+    "results",
+    "diagnostics"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "fingerprintSchemaVersion": { "const": "1.0" },
+    "versionAssessmentSchemaVersion": { "const": "1.0" },
+    "intelligenceSchemaVersion": { "const": "1.0" },
+    "intelligenceStatuses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "providers", "diagnostics"],
+        "properties": {
+          "status": {
+            "enum": [
+              "RESULTS",
+              "NO_RESULTS",
+              "PROVIDER_UNAVAILABLE",
+              "PARTIAL_RESULTS",
+              "INTELLIGENCE_UNAVAILABLE"
+            ]
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["providerId", "status", "diagnostics"],
+              "properties": {
+                "providerId": { "type": "string" },
+                "status": {
+                  "enum": [
+                    "RESULTS",
+                    "NO_RESULTS",
+                    "PARTIAL_RESULTS",
+                    "PROVIDER_UNAVAILABLE",
+                    "UNSUPPORTED"
+                  ]
+                },
+                "diagnostics": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          },
+          "diagnostics": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "results": { "type": "array", "items": { "$ref": "#/$defs/result" } },
+    "diagnostics": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ecosystem", "name"],
+      "properties": { "ecosystem": { "type": "string" }, "name": { "type": "string" } }
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceIndex", "type", "source", "normalizedValue"],
+      "properties": {
+        "evidenceIndex": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string" },
+        "source": { "type": "string" },
+        "normalizedValue": { "type": "string" },
+        "key": { "type": "string" }
+      }
+    },
+    "rangeAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerId",
+        "advisoryId",
+        "package",
+        "rangeType",
+        "status",
+        "rawVersion",
+        "comparisons",
+        "reason",
+        "evidenceReferences"
+      ],
+      "properties": {
+        "providerId": { "type": "string" },
+        "advisoryId": { "type": "string" },
+        "package": { "$ref": "#/$defs/package" },
+        "rangeType": { "type": "string" },
+        "strategyId": { "type": "string" },
+        "status": { "enum": ["within", "outside", "unknown", "invalid-range"] },
+        "rawVersion": { "type": "string" },
+        "reason": { "type": "string" },
+        "comparisons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["operator", "boundary"],
+            "properties": {
+              "operator": { "enum": ["<", "<=", "=", "==", "!=", ">=", ">"] },
+              "boundary": { "type": "string" },
+              "matched": { "type": "boolean" }
+            }
+          }
+        },
+        "evidenceReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        }
+      }
+    },
+    "explanation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "type": "string" },
+        "message": { "type": "string" },
+        "providerId": { "type": "string" },
+        "mappingId": { "type": "string" },
+        "sourceRecordId": { "type": "string" },
+        "installedPackageSourceId": { "type": "string" },
+        "installedPackageRecordId": { "type": "string" },
+        "evidenceReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        }
+      }
+    },
+    "sourceSeverity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerId", "advisoryId", "values"],
+      "properties": {
+        "providerId": { "type": "string" },
+        "advisoryId": { "type": "string" },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "score"],
+            "properties": {
+              "type": { "type": "string" },
+              "score": { "type": "string" },
+              "severity": { "type": "string" },
+              "vector": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technologyId",
+        "applicability",
+        "aliases",
+        "sourceRecords",
+        "sourceSeverities",
+        "rangeAssessments",
+        "explanations"
+      ],
+      "properties": {
+        "technologyId": { "type": "string" },
+        "applicability": {
+          "enum": [
+            "AFFECTED",
+            "NOT_AFFECTED",
+            "PATCHED_BY_VENDOR",
+            "POTENTIALLY_AFFECTED",
+            "UNKNOWN",
+            "CONFLICTING_EVIDENCE",
+            "INSUFFICIENT_EVIDENCE"
+          ]
+        },
+        "packageMappingId": { "type": "string" },
+        "package": { "$ref": "#/$defs/package" },
+        "advisoryId": { "type": "string" },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "sourceRecords": {
+          "type": "array",
+          "items": { "$ref": "normalized-advisory.schema.json" }
+        },
+        "sourceSeverities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceSeverity" }
+        },
+        "rangeAssessments": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/rangeAssessment" }
+        },
+        "explanations": { "type": "array", "items": { "$ref": "#/$defs/explanation" } }
+      }
+    }
+  }
+}

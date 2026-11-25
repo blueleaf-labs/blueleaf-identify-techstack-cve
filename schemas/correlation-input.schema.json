@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/correlation-input-1.0.json",
+  "title": "Blueleaf vulnerability correlation input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "detections",
+    "versionAssessments",
+    "intelligenceResults",
+    "packageMappings"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "detections": {
+      "type": "array",
+      "items": {
+        "$ref": "https://blueleaf.dev/schemas/fingerprint-result-1.0.json#/$defs/detection"
+      }
+    },
+    "versionAssessments": {
+      "$ref": "https://blueleaf.dev/schemas/version-assessment-1.0.json"
+    },
+    "intelligenceResults": {
+      "type": "array",
+      "items": { "$ref": "multi-source-intelligence-result.schema.json" }
+    },
+    "packageMappings": {
+      "type": "array",
+      "items": {
+        "$ref": "https://blueleaf.dev/schemas/technology-package-mapping-1.0.json"
+      }
+    },
+    "installedPackages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mappingId",
+          "ecosystem",
+          "packageName",
+          "vendor",
+          "distribution",
+          "exactPackageRevision",
+          "verification",
+          "sourceId",
+          "recordId"
+        ],
+        "properties": {
+          "mappingId": { "type": "string", "minLength": 1 },
+          "ecosystem": { "type": "string", "minLength": 1 },
+          "packageName": { "type": "string", "minLength": 1 },
+          "vendor": { "type": "string", "minLength": 1 },
+          "distribution": { "type": "string", "minLength": 1 },
+          "exactPackageRevision": { "type": "string", "minLength": 1 },
+          "verification": { "const": "authoritative-inventory" },
+          "sourceId": { "type": "string", "minLength": 1 },
+          "recordId": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

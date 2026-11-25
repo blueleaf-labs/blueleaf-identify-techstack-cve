@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/version-range-evaluation-1.0.json",
+  "title": "Blueleaf Mechanical Version Range Evaluation",
+  "description": "Mechanical upstream version range membership. It is not a security verdict.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "strategyId", "rawVersion", "reason", "comparisons"],
+  "properties": {
+    "status": { "enum": ["within", "outside", "unknown", "invalid-range"] },
+    "strategyId": { "type": "string", "minLength": 1 },
+    "rawVersion": { "type": "string", "maxLength": 128 },
+    "reason": { "type": "string", "minLength": 1 },
+    "comparisons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["operator", "boundary"],
+        "properties": {
+          "operator": { "enum": ["<", "<=", "=", "==", "!=", ">=", ">"] },
+          "boundary": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "matched": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

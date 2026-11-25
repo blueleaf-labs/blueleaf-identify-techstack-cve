@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/technology-package-mapping-1.0.json",
+  "title": "Blueleaf explicit technology package identity mapping",
+  "description": "Caller-verified identity and version semantics. Technology detection alone does not imply this mapping.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mappingId",
+    "technologyId",
+    "package",
+    "authority",
+    "versionStrategyId",
+    "supportedRangeTypes"
+  ],
+  "properties": {
+    "mappingId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "technologyId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ecosystem", "name"],
+      "properties": {
+        "ecosystem": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "authority": {
+      "enum": ["operator-verified", "upstream-documentation", "vendor-documentation"]
+    },
+    "versionStrategyId": { "type": "string", "minLength": 1 },
+    "supportedRangeTypes": {
+      "type": "array",
+      "items": { "enum": ["SEMVER", "ECOSYSTEM"] },
+      "uniqueItems": true
+    },
+    "vendor": { "type": "string", "minLength": 1 },
+    "distribution": { "type": "string", "minLength": 1 },
+    "cpe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vendor", "product", "rangeType"],
+      "properties": {
+        "vendor": { "type": "string", "minLength": 1 },
+        "product": { "type": "string", "minLength": 1 },
+        "rangeType": { "enum": ["SEMVER", "ECOSYSTEM"] }
+      }
+    }
+  }
+}

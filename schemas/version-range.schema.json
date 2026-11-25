@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/version-range-1.0.json",
+  "title": "Blueleaf Advisory Version Range Contract",
+  "description": "Transport-neutral range inputs for future OSV/NVD correlation and vendor package evaluation. Phase 5 provides mechanical upstream comparisons only.",
+  "oneOf": [
+    { "$ref": "#/$defs/versionRange" },
+    { "$ref": "#/$defs/vendorAdvisoryRange" }
+  ],
+  "$defs": {
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operator", "version"],
+      "properties": {
+        "operator": { "enum": ["<", "<=", "=", "==", "!=", ">=", ">"] },
+        "version": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "versionRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "introduced": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "fixed": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "lastAffected": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "constraints": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/constraint" }
+        }
+      },
+      "not": { "required": ["fixed", "lastAffected"] }
+    },
+    "vendorAdvisoryRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ecosystem", "packageName"],
+      "properties": {
+        "ecosystem": { "type": "string", "minLength": 1 },
+        "packageName": { "type": "string", "minLength": 1 },
+        "vendor": { "type": "string", "minLength": 1 },
+        "distribution": { "type": "string", "minLength": 1 },
+        "introduced": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "fixed": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "lastAffected": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "constraints": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/constraint" }
+        }
+      },
+      "not": { "required": ["fixed", "lastAffected"] }
+    }
+  }
+}

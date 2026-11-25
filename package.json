@@ -1,0 +1,57 @@
+{
+  "name": "blueleaf-identify-techstack-cve",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Technology identification and evidence-based vulnerability assessment with CLI and HTTP API support.",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "blueleaf": "./dist/cli/bin.js"
+  },
+  "files": [
+    "dist/",
+    "schemas/",
+    "docs/",
+    "README.md",
+    "ARCHITECTURE.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "scripts/release-smoke.mjs"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "pnpm@10.12.1",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "release:smoke": "node scripts/release-smoke.mjs",
+    "start": "tsx src/cli/main.ts",
+    "start:api": "tsx src/api/main.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@types/node": "^22.15.30",
+    "ajv": "^8.20.0",
+    "eslint": "^9.29.0",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.1",
+    "vitest": "^3.2.4"
+  }
+}

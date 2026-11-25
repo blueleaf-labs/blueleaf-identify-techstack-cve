@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/normalized-advisory.schema.json",
+  "title": "Blueleaf normalized advisory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "aliases",
+    "affectedPackages",
+    "severity",
+    "references",
+    "provenance"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "aliases": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "summary": { "type": "string" },
+    "details": { "type": "string" },
+    "affectedPackages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["package", "ranges", "explicitVersions", "fixedVersions"],
+        "properties": {
+          "package": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ecosystem", "name"],
+            "properties": {
+              "ecosystem": { "type": "string" },
+              "name": { "type": "string" }
+            }
+          },
+          "ranges": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["type", "events"],
+              "properties": {
+                "type": { "type": "string" },
+                "repository": { "type": "string", "format": "uri" },
+                "events": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "introduced": { "type": "string" },
+                      "fixed": { "type": "string" },
+                      "lastAffected": { "type": "string" },
+                      "limit": { "type": "string" }
+                    },
+                    "minProperties": 1,
+                    "maxProperties": 1
+                  }
+                }
+              }
+            }
+          },
+          "explicitVersions": { "type": "array", "items": { "type": "string" } },
+          "fixedVersions": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "severity": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "score"],
+        "properties": {
+          "type": { "type": "string" },
+          "score": { "type": "string" },
+          "severity": { "type": "string" },
+          "vector": { "type": "string" }
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url"],
+        "properties": {
+          "type": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "publishedAt": { "type": "string", "format": "date-time" },
+    "modifiedAt": { "type": "string", "format": "date-time" },
+    "withdrawnAt": { "type": "string", "format": "date-time" },
+    "recordStatus": { "enum": ["active", "rejected", "withdrawn", "unknown"] },
+    "relatedIdentifiers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "cweIds": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CWE-[0-9]+$" },
+      "uniqueItems": true
+    },
+    "cpeConfigurations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/cpeConfiguration" }
+    },
+    "vendorPackageInformation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["providerId"],
+        "properties": {
+          "providerId": { "type": "string" },
+          "recordType": { "enum": ["affected-release", "package-state"] },
+          "productName": { "type": "string" },
+          "packageName": { "type": "string" },
+          "packageVersion": { "type": "string" },
+          "cpe": { "type": "string" },
+          "advisoryId": { "type": "string" },
+          "releaseDate": { "type": "string" },
+          "fixState": { "type": "string" },
+          "upstreamFix": { "type": "string" }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerId", "retrievedAt"],
+      "properties": {
+        "providerId": { "type": "string" },
+        "authority": { "enum": ["primary", "vendor", "aggregator", "unknown"] },
+        "originalIdentifier": { "type": "string" },
+        "recordUrl": { "type": "string", "format": "uri" },
+        "retrievedAt": { "type": "string", "format": "date-time" },
+        "sourceModifiedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "$defs": {
+    "cpeMatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criteria"],
+      "properties": {
+        "criteria": { "type": "string" },
+        "vulnerable": { "type": "boolean" },
+        "matchCriteriaId": { "type": "string" },
+        "versionStartIncluding": { "type": "string" },
+        "versionStartExcluding": { "type": "string" },
+        "versionEndIncluding": { "type": "string" },
+        "versionEndExcluding": { "type": "string" }
+      }
+    },
+    "cpeNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matches", "nodes"],
+      "properties": {
+        "operator": { "type": "string" },
+        "negate": { "type": "boolean" },
+        "matches": { "type": "array", "items": { "$ref": "#/$defs/cpeMatch" } },
+        "nodes": { "type": "array", "items": { "$ref": "#/$defs/cpeNode" } }
+      }
+    },
+    "cpeConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes"],
+      "properties": {
+        "operator": { "type": "string" },
+        "negate": { "type": "boolean" },
+        "nodes": { "type": "array", "items": { "$ref": "#/$defs/cpeNode" } }
+      }
+    }
+  }
+}

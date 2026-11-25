@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/api-error-1.0.json",
+  "title": "Blueleaf API Error",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "error"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": { "code": { "type": "string" }, "message": { "type": "string" } }
+    }
+  }
+}

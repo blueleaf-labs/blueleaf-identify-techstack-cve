@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/scan-result-1.0.json",
+  "title": "Blueleaf ScanResult",
+  "description": "End-to-end Phase 2–10 scan result. Sensitive request/response headers, cookies, and raw response body are excluded.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "target",
+    "generatedAt",
+    "probe",
+    "evidence",
+    "fingerprint",
+    "versions",
+    "intelligence",
+    "correlation",
+    "assessment",
+    "remediation"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "target": {
+      "$ref": "https://blueleaf.dev/schemas/identification-result-1.0.json#/$defs/target"
+    },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "probe": { "$ref": "#/$defs/probe" },
+    "evidence": { "$ref": "https://blueleaf.dev/schemas/evidence-collection-1.0.json" },
+    "fingerprint": { "$ref": "https://blueleaf.dev/schemas/fingerprint-result-1.0.json" },
+    "versions": { "$ref": "https://blueleaf.dev/schemas/version-assessment-1.0.json" },
+    "intelligence": {
+      "$ref": "https://blueleaf.dev/schemas/multi-source-intelligence-result.schema.json"
+    },
+    "correlation": { "$ref": "https://blueleaf.dev/schemas/correlation-result-1.0.json" },
+    "assessment": {
+      "$ref": "https://blueleaf.dev/schemas/security-assessment-result-1.0.json"
+    },
+    "remediation": { "$ref": "https://blueleaf.dev/schemas/remediation-plan-1.0.json" }
+  },
+  "$defs": {
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "finalUrl", "receivedBodyBytes", "redirectChain"],
+      "properties": {
+        "status": { "type": "integer", "minimum": 100, "maximum": 599 },
+        "finalUrl": { "type": "string", "format": "uri" },
+        "contentType": { "type": "string" },
+        "contentLength": { "type": "integer", "minimum": 0 },
+        "receivedBodyBytes": { "type": "integer", "minimum": 0 },
+        "redirectChain": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "status", "to"],
+            "properties": {
+              "from": { "type": "string", "format": "uri" },
+              "status": { "type": "integer", "minimum": 300, "maximum": 399 },
+              "to": { "type": "string", "format": "uri" }
+            }
+          }
+        },
+        "timing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requestStartedAt",
+            "responseReceivedAt",
+            "completedAt",
+            "durationMs"
+          ],
+          "properties": {
+            "requestStartedAt": { "type": "string", "format": "date-time" },
+            "responseReceivedAt": { "type": "string", "format": "date-time" },
+            "completedAt": { "type": "string", "format": "date-time" },
+            "durationMs": { "type": "number", "minimum": 0 }
+          }
+        },
+        "tls": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["authorized"],
+          "properties": {
+            "authorized": { "type": "boolean" },
+            "protocol": { "type": "string" },
+            "cipher": { "type": "string" },
+            "peerCertificate": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "subjectAltName": { "type": "string" },
+                "fingerprint256": { "type": "string" },
+                "validFrom": { "type": "string" },
+                "validTo": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

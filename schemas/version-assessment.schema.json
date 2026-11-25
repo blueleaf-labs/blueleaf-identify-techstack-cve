@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/version-assessment-1.0.json",
+  "title": "Blueleaf Version Assessment Collection",
+  "description": "Version parsing, normalization, candidate reconciliation, and provenance derived from Phase 4 detections.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "fingerprintSchemaVersion", "assessments"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "fingerprintSchemaVersion": { "const": "1.0" },
+    "assessments": { "type": "array", "items": { "$ref": "#/$defs/assessment" } }
+  },
+  "$defs": {
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceIndex", "type", "source", "normalizedValue"],
+      "properties": {
+        "evidenceIndex": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string" },
+        "source": { "type": "string" },
+        "normalizedValue": { "type": "string", "maxLength": 2048 },
+        "key": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["major"],
+      "properties": {
+        "major": { "type": "integer", "minimum": 0 },
+        "minor": { "type": "integer", "minimum": 0 },
+        "patch": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "upstreamVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheme", "normalized", "components"],
+      "properties": {
+        "scheme": { "type": "string", "minLength": 1 },
+        "normalized": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "components": { "$ref": "#/$defs/components" },
+        "prerelease": { "type": "array", "items": { "type": ["string", "integer"] } },
+        "build": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "vendorPackageVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rawValue", "upstreamValue", "revision"],
+      "properties": {
+        "rawValue": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "upstreamValue": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "vendor": { "type": "string", "minLength": 1 },
+        "distribution": { "type": "string", "minLength": 1 },
+        "epoch": { "type": "integer", "minimum": 0 },
+        "revision": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "observedVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rawValue", "candidateValue", "confidence", "evidenceReferences"],
+      "properties": {
+        "rawValue": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "candidateValue": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "evidenceReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        }
+      }
+    },
+    "candidateAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rawObservedVersion", "parsingStatus", "reason", "evidenceReferences"],
+      "properties": {
+        "rawObservedVersion": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "strategyId": { "type": "string", "minLength": 1 },
+        "parsingStatus": {
+          "enum": [
+            "parsed",
+            "incomplete",
+            "ambiguous",
+            "malformed",
+            "unsupported",
+            "unknown"
+          ]
+        },
+        "parsedUpstreamVersion": { "$ref": "#/$defs/upstreamVersion" },
+        "partialUpstreamComponents": { "$ref": "#/$defs/components" },
+        "vendorPackageVersion": { "$ref": "#/$defs/vendorPackageVersion" },
+        "reason": { "type": "string", "minLength": 1 },
+        "evidenceReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technologyId",
+        "displayName",
+        "category",
+        "versionConfidence",
+        "parsingStatus",
+        "reconciliationStatus",
+        "rawObservedVersions",
+        "parsedUpstreamVersions",
+        "vendorPackageVersions",
+        "candidateAssessments"
+      ],
+      "properties": {
+        "technologyId": { "type": "string", "minLength": 1 },
+        "displayName": { "type": "string", "minLength": 1 },
+        "category": { "type": "string", "minLength": 1 },
+        "versionConfidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "parsingStatus": {
+          "enum": [
+            "parsed",
+            "incomplete",
+            "ambiguous",
+            "malformed",
+            "unsupported",
+            "unknown"
+          ]
+        },
+        "reconciliationStatus": {
+          "enum": ["single", "corroborated", "conflicting", "ambiguous", "unavailable"]
+        },
+        "rawObservedVersions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/observedVersion" }
+        },
+        "parsedUpstreamVersions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/upstreamVersion" }
+        },
+        "vendorPackageVersions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/vendorPackageVersion" }
+        },
+        "candidateAssessments": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/candidateAssessment" }
+        },
+        "selectedUpstreamVersion": { "$ref": "#/$defs/upstreamVersion" }
+      }
+    }
+  }
+}

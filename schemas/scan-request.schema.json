@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/scan-request-1.0.json",
+  "title": "Blueleaf ScanRequest",
+  "description": "Versioned input shared by the CLI and HTTP API.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "target"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "target": {
+      "$ref": "https://blueleaf.dev/schemas/identification-result-1.0.json#/$defs/target"
+    }
+  }
+}

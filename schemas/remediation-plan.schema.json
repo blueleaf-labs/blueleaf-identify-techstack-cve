@@ -1,0 +1,319 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/remediation-plan-1.0.json",
+  "title": "Blueleaf deterministic remediation plan",
+  "description": "Evidence-backed guidance over supplied Phase 5–9 results. It does not change security assessments, infer exploitability, or mean absence of a plan is safety.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "assessedAt",
+    "securityAssessmentState",
+    "plans",
+    "limitations"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "assessedAt": { "type": "string", "format": "date-time" },
+    "securityAssessmentState": { "type": "string" },
+    "plans": { "type": "array", "items": { "$ref": "#/$defs/componentPlan" } },
+    "limitations": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "ACTION_REQUIRED",
+        "UPGRADE_RECOMMENDED",
+        "VENDOR_UPDATE_REQUIRED",
+        "PATCH_ALREADY_APPLIED",
+        "NO_ACTION_IDENTIFIED",
+        "MANUAL_REVIEW_REQUIRED",
+        "REMEDIATION_UNAVAILABLE"
+      ]
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerId", "advisoryId", "url", "authority", "authoritative"],
+      "properties": {
+        "providerId": { "type": "string" },
+        "advisoryId": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "authority": { "type": "string" },
+        "authoritative": { "type": "boolean" }
+      }
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ecosystem", "name"],
+      "properties": { "ecosystem": { "type": "string" }, "name": { "type": "string" } }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["supported", "end-of-life", "unknown", "not-assessed"] },
+        "endOfLifeAt": { "type": "string" },
+        "providerId": { "type": "string" },
+        "reference": { "type": "string", "format": "uri" },
+        "concern": { "type": "string" },
+        "migrationPath": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["technologyId", "displayName", "recommendation", "reference"],
+          "properties": {
+            "technologyId": { "type": "string" },
+            "displayName": { "type": "string" },
+            "package": { "$ref": "#/$defs/package" },
+            "recommendation": { "type": "string" },
+            "reference": { "type": "string", "format": "uri" }
+          }
+        }
+      }
+    },
+    "upgrade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "scheme", "strategyId", "sourceRequirements", "reason"],
+      "properties": {
+        "version": { "type": "string" },
+        "scheme": { "type": "string" },
+        "strategyId": { "type": "string" },
+        "sourceRequirements": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "reason": { "type": "string" }
+      }
+    },
+    "fixEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "providerId",
+        "advisoryId",
+        "value",
+        "authority",
+        "authoritative",
+        "recommendationEligible",
+        "reason",
+        "references"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "upstream-fixed-version",
+            "vendor-package-fixed-version",
+            "vendor-upstream-fix",
+            "cpe-fixed-boundary"
+          ]
+        },
+        "providerId": { "type": "string" },
+        "advisoryId": { "type": "string" },
+        "value": { "type": "string" },
+        "package": { "$ref": "#/$defs/package" },
+        "versionStrategyId": { "type": "string" },
+        "authority": { "type": "string" },
+        "authoritative": { "type": "boolean" },
+        "recommendationEligible": { "type": "boolean" },
+        "reason": { "type": "string" },
+        "references": { "type": "array", "items": { "$ref": "#/$defs/reference" } }
+      }
+    },
+    "vendorUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerId",
+        "packageName",
+        "ecosystem",
+        "vendor",
+        "distribution",
+        "fixedPackageRevisions",
+        "upstreamFixes",
+        "references",
+        "administratorVerificationRequired",
+        "instructions"
+      ],
+      "properties": {
+        "providerId": { "type": "string" },
+        "packageName": { "type": "string" },
+        "ecosystem": { "type": "string" },
+        "vendor": { "type": "string" },
+        "distribution": { "type": "string" },
+        "fixedPackageRevisions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "upstreamFixes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "references": { "type": "array", "items": { "$ref": "#/$defs/reference" } },
+        "administratorVerificationRequired": { "const": true },
+        "instructions": { "type": "string" }
+      }
+    },
+    "advisoryPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aliases",
+        "state",
+        "securityAssessmentState",
+        "correlationApplicability",
+        "confidence",
+        "severity",
+        "highestSeverityBand",
+        "exploitability",
+        "priority",
+        "fixedVersionEvidence",
+        "vendorUpdates",
+        "references",
+        "followUpVerification",
+        "explanations",
+        "limitations",
+        "correlation",
+        "sourceRecords"
+      ],
+      "properties": {
+        "advisoryId": { "type": "string" },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "state": { "$ref": "#/$defs/state" },
+        "securityAssessmentState": { "type": "string" },
+        "correlationApplicability": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "severity": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["providerId", "advisoryId", "values", "bands"],
+            "properties": {
+              "providerId": { "type": "string" },
+              "advisoryId": { "type": "string" },
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://blueleaf.dev/schemas/normalized-advisory.schema.json#/properties/severity/items"
+                }
+              },
+              "bands": {
+                "type": "array",
+                "items": { "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN"] },
+                "uniqueItems": true
+              }
+            }
+          }
+        },
+        "highestSeverityBand": {
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN"]
+        },
+        "exploitability": { "const": "NOT_ASSESSED" },
+        "priority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["level", "severityBand", "applicabilityState", "rationale"],
+          "properties": {
+            "level": { "enum": ["P0", "P1", "P2", "P3", "REVIEW", "NONE"] },
+            "severityBand": { "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN"] },
+            "applicabilityState": { "type": "string" },
+            "rationale": { "type": "string" }
+          }
+        },
+        "fixedVersionEvidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/fixEvidence" }
+        },
+        "minimumSafeUpgrade": { "$ref": "#/$defs/upgrade" },
+        "vendorUpdates": { "type": "array", "items": { "$ref": "#/$defs/vendorUpdate" } },
+        "references": { "type": "array", "items": { "$ref": "#/$defs/reference" } },
+        "followUpVerification": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "explanations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "correlation": {
+          "$ref": "https://blueleaf.dev/schemas/correlation-result-1.0.json#/$defs/result"
+        },
+        "sourceRecords": {
+          "type": "array",
+          "items": {
+            "$ref": "https://blueleaf.dev/schemas/normalized-advisory.schema.json"
+          }
+        }
+      }
+    },
+    "componentPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technologyId",
+        "displayName",
+        "state",
+        "securityAssessmentState",
+        "vendorPackageRevisions",
+        "advisoryPlans",
+        "lifecycle",
+        "references",
+        "followUpVerification",
+        "explanations",
+        "limitations"
+      ],
+      "properties": {
+        "technologyId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "state": { "$ref": "#/$defs/state" },
+        "securityAssessmentState": { "type": "string" },
+        "packageMappingId": { "type": "string" },
+        "package": { "type": "object" },
+        "versionStrategyId": { "type": "string" },
+        "currentUpstreamVersion": { "type": "string" },
+        "vendorPackageRevisions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "advisoryPlans": { "type": "array", "items": { "$ref": "#/$defs/advisoryPlan" } },
+        "recommendedTargetVersion": { "$ref": "#/$defs/upgrade" },
+        "lifecycle": { "$ref": "#/$defs/lifecycle" },
+        "references": { "type": "array", "items": { "$ref": "#/$defs/reference" } },
+        "followUpVerification": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "explanations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

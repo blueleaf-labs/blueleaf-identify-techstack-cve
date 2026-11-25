@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/fingerprint-result-1.0.json",
+  "title": "Blueleaf Fingerprint Result",
+  "description": "Technology detections and provenance derived from a Phase 3 evidence collection.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "evidenceSchemaVersion", "detections"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "evidenceSchemaVersion": { "const": "1.0" },
+    "detections": { "type": "array", "items": { "$ref": "#/$defs/detection" } }
+  },
+  "$defs": {
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceIndex", "type", "source", "normalizedValue"],
+      "properties": {
+        "evidenceIndex": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string" },
+        "source": { "type": "string" },
+        "normalizedValue": { "type": "string", "maxLength": 2048 },
+        "key": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "versionCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "confidence", "evidenceReferences"],
+      "properties": {
+        "value": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "evidenceReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        }
+      }
+    },
+    "contradictoryEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceIndex",
+        "type",
+        "source",
+        "normalizedValue",
+        "technologyId",
+        "signalId"
+      ],
+      "properties": {
+        "evidenceIndex": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string" },
+        "source": { "type": "string" },
+        "normalizedValue": { "type": "string", "maxLength": 2048 },
+        "key": { "type": "string", "maxLength": 128 },
+        "technologyId": { "type": "string", "minLength": 1 },
+        "signalId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technologyId",
+        "displayName",
+        "category",
+        "versionCandidates",
+        "detectionConfidence",
+        "versionConfidence",
+        "matchedEvidenceReferences",
+        "detectionReasons",
+        "contradictoryEvidence"
+      ],
+      "properties": {
+        "technologyId": { "type": "string", "minLength": 1 },
+        "displayName": { "type": "string", "minLength": 1 },
+        "category": { "type": "string", "minLength": 1 },
+        "versionCandidate": { "$ref": "#/$defs/versionCandidate" },
+        "versionCandidates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/versionCandidate" }
+        },
+        "detectionConfidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "versionConfidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "matchedEvidenceReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        },
+        "detectionReasons": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "contradictoryEvidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/contradictoryEvidence" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueleaf.dev/schemas/security-assessment-input-1.0.json",
+  "title": "Blueleaf security assessment input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "assessedAt",
+    "detections",
+    "versionAssessments",
+    "intelligenceResults",
+    "correlation",
+    "packageMappings"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "assessedAt": { "type": "string", "format": "date-time" },
+    "detections": {
+      "type": "array",
+      "items": {
+        "$ref": "https://blueleaf.dev/schemas/fingerprint-result-1.0.json#/$defs/detection"
+      }
+    },
+    "versionAssessments": {
+      "$ref": "https://blueleaf.dev/schemas/version-assessment-1.0.json"
+    },
+    "intelligenceResults": {
+      "type": "array",
+      "items": { "$ref": "multi-source-intelligence-result.schema.json" }
+    },
+    "correlation": { "$ref": "https://blueleaf.dev/schemas/correlation-result-1.0.json" },
+    "packageMappings": {
+      "type": "array",
+      "items": {
+        "$ref": "https://blueleaf.dev/schemas/technology-package-mapping-1.0.json"
+      }
+    },
+    "sourceIndependenceGroups": {
+      "type": "array",
+      "description": "Optional caller-verified source lineage declarations. Undeclared providers do not count as independent corroboration.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["providerId", "sourceGroupId", "verified"],
+        "properties": {
+          "providerId": { "type": "string", "minLength": 1 },
+          "sourceGroupId": { "type": "string", "minLength": 1 },
+          "verified": { "const": true }
+        }
+      }
+    }
+  }
+}
