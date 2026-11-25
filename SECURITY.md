@@ -6,7 +6,15 @@ Please do not report a suspected vulnerability in a public issue, pull request, 
 release comment. Reports should use a private channel so maintainers can investigate before details
 become public.
 
-The repository's configured private reporting status could not be verified during this review.
+GitHub Private Vulnerability Reporting is enabled for this repository.
+
+To report a suspected vulnerability, use the
+[Report a vulnerability](https://github.com/blueleaf-labs/blueleaf-identify-techstack-cve/security/advisories/new)
+feature under the repository's Security tab.
+
+Reports submitted through this channel are private and available to repository maintainers.
+Please do not disclose vulnerability details publicly before coordinated disclosure.
+
 The repository remote identifies `blueleaf-labs/blueleaf-identify-techstack-cve`, but GitHub
 configuration access was unavailable. The GitHub **Security → Report a vulnerability** workflow
 is the intended channel only after a maintainer confirms that private vulnerability reporting is
